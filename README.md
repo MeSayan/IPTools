@@ -12,6 +12,5 @@ ipinfo
 
 b)ipgeo: Gives geographic information of each  hop from host machine to destination machine.
 Usage: 
-ipgeo www.google.com
-or ipgeo 89.52.36.21       
+ipgeo www.google.com   or ipgeo 89.52.36.21       
 ---------------------------------------------------------------------------------------------------------------------------------
