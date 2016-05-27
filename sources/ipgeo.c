@@ -1,39 +1,49 @@
-/*----------------------------------------------------------------------
+/*------------------------------------------------------------------------------
  * Name:   ipgeo
  * Author: Sayan Mahapatra
  * Date:	23/05/2016
- * Description: A small program to list out geographical details of each
- * hop in a route.
+ * Description: A frontend to traceroute command which also prints out the 
+ * geographic details of each hop . Since private IP's can't be traced they are
+ * ignored.
  * In short it is a route tracing program which prints geopgraphic 
- * details of each hop from host machine to another machine.
+ * details of each hop from host machine to destination machine.
  * Details of IP are obtained from "ipinfo.io" website
- * Copyright © 2016 Sayan Mahapatra
- *---------------------------------------------------------------------
+ * Copyright © 2016 Sayan Mahapatra.
+ *------------------------------------------------------------------------------
  */
-
 
 #include  <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+void cleanup();
+
 
 int main(int argc,char *argv[])
 {
-	int strrec;
+	int strrec,i;
 	char c;
 	char *d;
-	char command[50];
-	char buffer[20];
+	char command[100];
+	char buffer[50]="";
 	
 	//Program takes exactly one input .Other inputs are ignored
 	//if no inputs are available program terminates
 	if(argc==1)
 	exit(1);
 	
+	for(i=1;i<argc;i++)
+	{
+		strcat(buffer," ");
+		strcat(buffer,argv[i]);
+	}
+		
 	//Generating Route Information File
-	sprintf(command,"traceroute %s >routeinfo.txt",argv[1]);
+	sprintf(command,"traceroute %s > routeinfo.txt",buffer);
 	system(command);
 	
+	//Restoring buffer to empty state
+	strcpy(buffer,"");
 	
 	//Parsing routeinfo for list of addresss
 	FILE *wp=fopen("iplist.txt","w");
@@ -42,9 +52,10 @@ int main(int argc,char *argv[])
 	
 	if(wp==NULL || rp==NULL)
 	{
-		printf("File Error try again later\n");
+		cleanup();
 		exit(2);
 	}
+	
 	while((c=fgetc(rp))!=EOF)
 	{
 		if(c==')'){
@@ -71,15 +82,14 @@ int main(int argc,char *argv[])
 	
 	if(rp==NULL)
 	{
-		printf("File Error Try Again Later\n");
-		return -1;
+		cleanup();
+		exit(2);
 	}
 	
 	
 	fscanf(rp,"%s",buffer);
-	printf("Tracing Route to %s (%s) (max 30 hops)\n",argv[1],buffer);
+	printf("%s",buffer);
 	
-		
 	//Generating output.txt which contains geographic details of hops
 	while(fscanf(rp,"%s",buffer)!=EOF)
 	{
@@ -89,16 +99,17 @@ int main(int argc,char *argv[])
 	}
 	fclose(rp);
 	
+	/*****/
+	
 	//Copying output.txt to final.txt so data can be properly formatted.
 	rp=fopen("output.txt","r");
 	wp=fopen("final.txt","w");
 	
 	if(rp==NULL||wp==NULL)
-	{
-		printf("File Error Try Again Later\n");
-		exit(2);
+	{       
+		cleanup();
+		exit(4);
 	}
-	
 	//Performing some formatting on final.txt
 	
 	while(fgets(buffer,80,rp)!=NULL)
@@ -107,7 +118,8 @@ int main(int argc,char *argv[])
 		{   
 			if(*d=='{'|| *d=='}')
 			{
-				fputs("--------------------------------------------------------------------------------",wp);
+				fputs("--------------------------------------------------------"
+				"-----------------------",wp);
 				break;//Ignore further reading that line
 			}
 			if(*d!='"' && *d!=',' )
@@ -124,6 +136,12 @@ int main(int argc,char *argv[])
 	
 	//Displaying only lines which contain desired geo details
 	rp=fopen("final.txt","r");
+	if(rp == NULL)
+	{	
+		cleanup();
+		exit(5);
+    }
+	
 	while(fgets(buffer,80,rp)!=NULL)
 	{
 		if(!strstr(buffer,"hostname") && !strstr(buffer,"org"))
@@ -132,10 +150,16 @@ int main(int argc,char *argv[])
 	
 	//Cleaning Up!
 	fclose(rp);
-	remove("routeinfo.txt");
-	remove("output.txt");
-	remove("iplist.txt");
-	remove("final.txt");
-	
+
 	exit(0);//Indicates program success
+	
+}
+
+void cleanup()
+{
+	//Removing Files
+	remove("routeinfo.txt");
+	remove("iplist.txt");
+	remove("output.txt");
+	remove("final.txt");
 }
