@@ -23,7 +23,7 @@ int main(int argc,char *argv[])
 	char c;
 	char *d;
 	char command[50];
-	char buffer[20];;
+	char buffer[20];
 	
 	//Program takes exactly one input .Other inputs are ignored
 	//if no inputs are available program terminates
@@ -76,9 +76,9 @@ int main(int argc,char *argv[])
 	}
 	
 	
-	
-	//Ignoring First Value 
 	fscanf(rp,"%s",buffer);
+	printf("Tracing Route to %s (%s) (max 30 hops)\n",argv[1],buffer);
+	
 		
 	//Generating output.txt which contains geographic details of hops
 	while(fscanf(rp,"%s",buffer)!=EOF)
@@ -107,11 +107,10 @@ int main(int argc,char *argv[])
 		{   
 			if(*d=='{'|| *d=='}')
 			{
-				fputs("-----------------------------------------------"
-					  "-------------------------",wp);
+				fputs("--------------------------------------------------------------------------------",wp);
 				break;//Ignore further reading that line
 			}
-			if(*d!='"')
+			if(*d!='"' && *d!=',' )
 			putc(*d,wp);
 			
 			else if(*d=='"'&& *(d+1)=='"')
@@ -123,14 +122,20 @@ int main(int argc,char *argv[])
 	fclose(rp);
 	fclose(wp);	
 	
-	//Using grep to display only lines which contain city,regio etc
-	system("grep -e ip -e city -e region -e country -e postal -e --"
-			"final.txt");
+	//Displaying only lines which contain desired geo details
+	rp=fopen("final.txt","r");
+	while(fgets(buffer,80,rp)!=NULL)
+	{
+		if(!strstr(buffer,"hostname") && !strstr(buffer,"org"))
+		printf("%s",buffer);
+	}
 	
 	//Cleaning Up!
-	system("rm ./routeinfo.txt ./output.txt  ./iplist.txt ./final.txt");
-	
-	
+	fclose(rp);
+	remove("routeinfo.txt");
+	remove("output.txt");
+	remove("iplist.txt");
+	remove("final.txt");
 	
 	exit(0);//Indicates program success
 }
