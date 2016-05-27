@@ -152,7 +152,6 @@ int main(int argc,char *argv[])
 	fclose(rp);
 
 	exit(0);//Indicates program success
-	
 }
 
 void cleanup()
