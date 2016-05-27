@@ -8,4 +8,4 @@ Usage: ipinfo 89.55.1.25 89.6.2.45 .... or ipinfo
 
 b) ipgeo : Gives geographic information of each  hop from host machine to destination machine.                           Usage:ipgeo www.google.com   or ipgeo 89.52.36.21       
 
-Data is pulled from the website ipinfo.io
+Data is pulled from the website https://ipinfo.io/
