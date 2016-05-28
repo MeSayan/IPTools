@@ -24,8 +24,8 @@ int main(int argc,char *argv[])
 	int strrec,i;
 	char c;
 	char *d;
-	char command[100];
-	char buffer[50]="";
+	char command[255]="";
+	char buffer[255]="";
 	
 	//Program takes exactly one input .Other inputs are ignored
 	//if no inputs are available program terminates
@@ -55,6 +55,9 @@ int main(int argc,char *argv[])
 		cleanup();
 		exit(2);
 	}
+	
+	//Getting Status from traceroute
+	fgets(buffer,255,rp);
 	
 	while((c=fgetc(rp))!=EOF)
 	{
@@ -87,8 +90,11 @@ int main(int argc,char *argv[])
 	}
 	
 	
-	fscanf(rp,"%s",buffer);
+	
 	printf("%s",buffer);
+	
+	//Skipping first line of iplist
+	fscanf(rp,"%s",buffer);
 	
 	//Generating output.txt which contains geographic details of hops
 	while(fscanf(rp,"%s",buffer)!=EOF)
@@ -150,8 +156,9 @@ int main(int argc,char *argv[])
 	
 	//Cleaning Up!
 	fclose(rp);
-
+	cleanup();
 	exit(0);//Indicates program success
+	
 }
 
 void cleanup()
