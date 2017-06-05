@@ -29,8 +29,10 @@ int main(int argc,char *argv[])
 	
 	//Program takes exactly one input .Other inputs are ignored
 	//if no inputs are available program terminates
-	if(argc==1)
-	exit(1);
+	if(argc == 1) {
+        fprintf(stdout,"Usage: ipgeo hostname \n");
+	    exit(1);
+    }
 	
 	for(i=1;i<argc;i++)
 	{
