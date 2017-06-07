@@ -25,8 +25,10 @@ int main(int argc,char *argv[])
 	
 	//Program takes exactly one input .Other inputs are ignored
 	//if no inputs are available program terminates
-	if(argc==1)
-	exit(1);
+	if(argc==1) {
+        fprintf(stdout,"Usage: ipgeo host-name \n");
+	    exit(1);
+    }
 	
 	//Generating Route Information File
 	sprintf(command,"traceroute %s >routeinfo.txt",argv[1]);
@@ -81,7 +83,7 @@ int main(int argc,char *argv[])
 	//Generating output.txt which contains geographic details of hops
 	while(fscanf(rp,"%s",buffer)!=EOF)
 	{
-		if(!strstr(buffer,"172."))
+		if(!strstr(buffer,"172.") && !(strstr(buffer,"192")) && !strstr(buffer,"10")) // Ignoring private IP's which generally begin with 172
 		sprintf(command,"curl -s ipinfo.io/%s>>output.txt",buffer);
 		system(command);
 	}
@@ -105,14 +107,14 @@ int main(int argc,char *argv[])
 		{   
 			if(*d=='{'|| *d=='}')
 			{
-				fputs("--------------------------------------------------------------------------",wp);
+				fputs("--------------------------------------------------------------------------------",wp);
 				break;//Ignore further reading that line
 			}
 			if(*d!='"')
-			putc(*d,wp);
+			fputc(*d,wp);
 			
-			else if(*d=='"'&& *(d+1)=='"')
-			fprintf(wp,"N/A");
+			else if(*d=='"' && *(d+1)=='"')
+			fprintf(wp,"N/A"); // For Empty Fields output N/A
 		}
 		putc('\n',wp);
 	}
